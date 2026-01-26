@@ -1,0 +1,54 @@
+name: Prepare Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_update_type:
+        description: What type of version bump should be done.
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+      exact_version:
+        description: An optional exact version to bump to. If this is specified, version_update_type will be ignored.
+        type: string
+        required: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: mongodb-js/devtools-shared/actions/setup-bot-token@main
+        id: app-token
+        with:
+          app-id: ${{ vars.DEVTOOLS_BOT_APP_ID }}
+          private-key: ${{ secrets.DEVTOOLS_BOT_PRIVATE_KEY }}
+
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+
+      - name: Bump version
+        run: |
+          echo "new-version=$(npm version ${{ github.event.inputs.exact_version || github.event.inputs.version_update_type }} --no-git-tag-version)" >> $GITHUB_OUTPUT
+        id: version
+
+      - name: Create Release PR
+        uses: peter-evans/create-pull-request@5e914681df9dc83aa4e4905692ca88beb2f9e91f # 7.0.5
+        with:
+          branch: release/${{ steps.version.outputs.new-version }}
+          title: 'chore: bump version to ${{ steps.version.outputs.new-version }}'
+          token: ${{ steps.app-token.outputs.token }}
+          draft: false
+          body: |
+            An automated PR for next release.
+
+            **Note**: Don't merge this manually. Instead, run the [Publish Release](${{ github.server_url }}/${{github.repository}}/actions/workflows/publish-release.yml) workflow using `release/${{ steps.version.outputs.new-version }}` as target branch.
+
+            This PR will be merged automatically and a new Github release will be tagged when the package is published to NPM.
+          commit-message: 'chore: bump version to ${{ steps.version.outputs.new-version }}'
+          labels: ignore-for-release

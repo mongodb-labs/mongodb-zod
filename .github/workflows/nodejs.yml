@@ -1,0 +1,82 @@
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+name: CI
+
+jobs:
+  test:
+    name: Test
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        node-version: [20.x, 22.x, 24.x]
+    runs-on: ${{matrix.os}}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install Dependencies
+        run: npm ci
+      - name: Test
+        env:
+          OKTA_TEST_CREDENTIALS: ${{ secrets.OKTA_TEST_CREDENTIALS }}
+          OKTA_TEST_CONFIG: ${{ secrets.OKTA_TEST_CONFIG }}
+          AZURE_TEST_CREDENTIALS: ${{ secrets.AZURE_TEST_CREDENTIALS }}
+          AZURE_TEST_CONFIG: ${{ secrets.AZURE_TEST_CONFIG }}
+        run: npm run test-ci
+  check:
+    name: Check
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        node-version: [22.x]
+    runs-on: ${{matrix.os}}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install Dependencies
+        run: npm ci
+      - name: Compile
+        run: npm run compile
+      - name: Check
+        run: npm run check
+
+  package:
+    name: Package for publishing
+    runs-on: ubuntu-latest
+    if: ${{ startsWith(github.head_ref, 'release/') }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 22.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+
+      - name: Install Dependencies
+        run: npm ci --ignore-engines
+
+      - name: Compile
+        run: npm run compile
+
+      - name: Pack
+        run: npm pack
+
+      - name: Archive artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: package
+          path: mongodb-js-mongodb-zod-*.tgz
