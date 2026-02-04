@@ -47,20 +47,15 @@
     "test-cov": "nyc -x \"**/*.spec.*\" --reporter=lcov --reporter=text --reporter=html npm run test",
     "test-watch": "npm run test -- --watch",
     "test-ci": "npm run test-cov",
-    "reformat": "npm run prettier -- --write . && npm run eslint . -- --fix",
-    "prepare": "husky install",
-    "precommit": "precommit"
+    "reformat": "npm run prettier -- --write . && npm run eslint . -- --fix"
   },
   "devDependencies": {
     "@microsoft/api-extractor": "^7.52.8",
     "@mongodb-js/eslint-config-devtools": "^0.9.9",
     "@mongodb-js/mocha-config-devtools": "^1.0.0",
-    "@mongodb-js/monorepo-tools": "^1.1.4",
     "@mongodb-js/prettier-config-devtools": "^1.0.1",
     "@mongodb-js/tsconfig-devtools": "^1.0.0",
     "@types/chai": "^4.2.21",
-    "@types/electron-to-chromium": "^1.5.0",
-    "@types/express": "^5.0.3",
     "@types/mocha": "^10.0.2",
     "@types/node": "^20.14.8",
     "@types/sinon-chai": "^3.2.5",
@@ -68,18 +63,17 @@
     "depcheck": "^1.4.1",
     "eslint": "^7.25.0",
     "gen-esm-wrapper": "^1.1.0",
-    "husky": "^8.0.3",
     "mocha": "^11.7.1",
     "mongodb": "^7.0.0",
-    "mongodb-runner": "^5.2.0",
+    "mongodb-runner": "^6.6.0",
     "nyc": "^15.1.0",
-    "prettier": "^2.7.1",
+    "prettier": "^3.8.1",
     "rimraf": "^5.0.0",
     "sinon": "^15.0.3",
     "typescript": "^5.8.3"
   },
   "peerDependencies": {
-    "zod": "^4.3.6",
-    "mongodb": "^6.0.0 || ^7.0.0"
+    "mongodb": "^6.0.0 || ^7.0.0",
+    "zod": "^4.3.6"
   }
 }
