@@ -3,6 +3,7 @@ import type { Collection, Document } from 'mongodb';
 import type { JSONSchemaGeneratorParams } from 'zod/v4/core';
 export type { JSONSchemaGeneratorParams };
 
+/** @public */
 export interface CollectionWithZodSchema<
   TSchema extends Document,
 > extends Collection<TSchema> {
@@ -10,12 +11,14 @@ export interface CollectionWithZodSchema<
   installSchemaValidation(): Promise<void>;
 }
 
+/** @public */
 export interface InstallSchemaOpts {
   validationAction?: 'error' | 'warn';
   validationLevel?: 'off' | 'moderate' | 'strict';
   jsonSchemaOptions?: JSONSchemaGeneratorParams;
 }
 
+/** @public */
 export function withSchema<
   OriginalTSchema extends Document,
   TSchema extends OriginalTSchema,
