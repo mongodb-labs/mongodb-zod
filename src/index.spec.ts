@@ -8,6 +8,7 @@ describe('withSchema', function () {
   let cluster: MongoCluster;
 
   before(async function () {
+    this.timeout(180_000);
     cluster = await MongoCluster.start({
       topology: 'replset',
       secondaries: 0,
